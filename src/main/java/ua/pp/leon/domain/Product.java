@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -41,21 +40,18 @@ public class Product implements Serializable, Comparable<Product> {
     protected Double price = 0.0;
     @Column
     protected String sku;
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     protected Category category;
-    @ManyToMany(fetch = FetchType.LAZY, targetEntity = Order.class, cascade = {
-        CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST
-    })
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
     @JoinTable(name = "product_order",
-        joinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
-        foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-        inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-//    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "products", cascade = CascadeType.ALL)
+            joinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     protected Set<Order> orders = new HashSet<>();
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
-    protected OrderItem orderItem;
 
     @Override
     public int compareTo(Product o) {
@@ -99,6 +95,12 @@ public class Product implements Serializable, Comparable<Product> {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", sku=" + sku
+                + ", category=" + category.getName() + ", orders=" + orders.size() + '}';
+    }
+
     public Long getId() {
         return id;
     }
@@ -135,11 +137,11 @@ public class Product implements Serializable, Comparable<Product> {
         return category;
     }
 
-    public Set<Order> getOrders() {
-        return orders;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public OrderItem getOrderItem() {
-        return orderItem;
+    public Set<Order> getOrders() {
+        return orders;
     }
 }

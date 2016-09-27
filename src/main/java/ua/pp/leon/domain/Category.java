@@ -67,6 +67,11 @@ public class Category implements Serializable, Comparable<Category> {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Category{" + "id=" + id + ", name=" + name + ", products=" + products.size() + '}';
+    }
+
     public Long getId() {
         return id;
     }

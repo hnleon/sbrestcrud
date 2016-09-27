@@ -1,6 +1,8 @@
 package ua.pp.leon.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -18,6 +20,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -33,25 +36,22 @@ public class Order implements Serializable, Comparable<Order> {
     @GenericGenerator(name = "order_generator", strategy = "increment")
     @GeneratedValue(generator = "order_generator")
     protected Long id;
+    @NotNull
     @Column(nullable = false, name = "order_date")
     @Temporal(TemporalType.DATE)
     protected Date orderDate;
+    @NotNull
     @Column(nullable = false, name = "summ", precision = 10, scale = 2)
     protected Double sum = 0.0;
-    @ManyToMany(fetch = FetchType.LAZY, targetEntity = Product.class, cascade = {
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {
         CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST
     })
+    @JsonIgnore
     @JoinTable(name = "product_order",
-        joinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
-        foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-        inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "product_order",
-//            joinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
-//            inverseJoinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false)
-//    )
+            joinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     protected Set<Product> products = new HashSet<>();
 
     @Override
@@ -88,6 +88,14 @@ public class Order implements Serializable, Comparable<Order> {
         return true;
     }
 
+    @Override
+    public String toString() {
+
+        return "Order{" + "id=" + id + ", orderDate="
+                + new SimpleDateFormat("yyyy-MM-dd").format(orderDate)
+                + ", sum=" + sum + ", products=" + products.size() + '}';
+    }
+
     public Long getId() {
         return id;
     }
@@ -96,12 +104,24 @@ public class Order implements Serializable, Comparable<Order> {
         this.id = id;
     }
 
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
     public Double getSum() {
         return sum;
     }
 
-    public void setSum(Double sum) {
-        this.sum = sum;
+    public Double recalculateSum() {
+        sum = 0.0;
+        for (Product product : products) {
+            sum += product.getPrice();
+        }
+        return sum;
     }
 
     public Set<Product> getProducts() {

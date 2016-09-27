@@ -1,6 +1,7 @@
 package ua.pp.leon.domain;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,6 +29,41 @@ public class OrderItem implements Serializable {
     @NotNull
     @OneToOne(fetch = FetchType.LAZY)
     protected Product product;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.quantity);
+        hash = 53 * hash + Objects.hashCode(this.product);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final OrderItem other = (OrderItem) obj;
+        if (!Objects.equals(this.quantity, other.quantity)) {
+            return false;
+        }
+        if (!Objects.equals(this.product, other.product)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" + "id=" + id + ", quantity=" + quantity + ", product="
+                + product.getName() + '}';
+    }
 
     public Long getId() {
         return id;
