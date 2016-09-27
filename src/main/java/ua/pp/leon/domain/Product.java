@@ -6,16 +6,13 @@ import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -44,14 +41,8 @@ public class Product implements Serializable, Comparable<Product> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     protected Category category;
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST})
-    @JoinTable(name = "product_order",
-            joinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
-            inverseJoinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
-            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-    protected Set<Order> orders = new HashSet<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    protected Set<OrderItem> orderItems = new HashSet<>();
 
     @Override
     public int compareTo(Product o) {
@@ -98,7 +89,7 @@ public class Product implements Serializable, Comparable<Product> {
     @Override
     public String toString() {
         return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", sku=" + sku
-                + ", category=" + category.getName() + ", orders=" + orders.size() + '}';
+                + ", category=" + category.getName() + ", orders=" + orderItems.size() + '}';
     }
 
     public Long getId() {
@@ -141,7 +132,7 @@ public class Product implements Serializable, Comparable<Product> {
         this.category = category;
     }
 
-    public Set<Order> getOrders() {
-        return orders;
+    public Set<OrderItem> getOrderItems() {
+        return orderItems;
     }
 }

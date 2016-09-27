@@ -1,6 +1,5 @@
 package ua.pp.leon.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,15 +8,11 @@ import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
@@ -43,16 +38,8 @@ public class Order implements Serializable, Comparable<Order> {
     @NotNull
     @Column(nullable = false, name = "summ", precision = 10, scale = 2)
     protected Double sum = 0.0;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {
-        CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST
-    })
-    @JsonIgnore
-    @JoinTable(name = "product_order",
-            joinColumns = @JoinColumn(name = "order_id", nullable = false, updatable = false),
-            inverseJoinColumns = @JoinColumn(name = "product_id", nullable = false, updatable = false),
-            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-    protected Set<Product> products = new HashSet<>();
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    protected Set<OrderItem> orderItems = new HashSet<>();
 
     @Override
     public int compareTo(Order o) {
@@ -93,7 +80,7 @@ public class Order implements Serializable, Comparable<Order> {
 
         return "Order{" + "id=" + id + ", orderDate="
                 + new SimpleDateFormat("yyyy-MM-dd").format(orderDate)
-                + ", sum=" + sum + ", products=" + products.size() + '}';
+                + ", sum=" + sum + ", products=" + orderItems.size() + '}';
     }
 
     public Long getId() {
@@ -118,13 +105,13 @@ public class Order implements Serializable, Comparable<Order> {
 
     public Double recalculateSum() {
         sum = 0.0;
-        for (Product product : products) {
-            sum += product.getPrice();
+        for (OrderItem orderItem : orderItems) {
+            sum += orderItem.getProduct().getPrice() * orderItem.getQuantity();
         }
         return sum;
     }
 
-    public Set<Product> getProducts() {
-        return products;
+    public Set<OrderItem> getOrderItems() {
+        return orderItems;
     }
 }

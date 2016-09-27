@@ -14,6 +14,8 @@ import ua.pp.leon.domain.Product;
 
 import static org.junit.Assert.*;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import ua.pp.leon.controller.data.CreateOrderParam;
+import ua.pp.leon.domain.OrderItem;
 import ua.pp.leon.service.OrderService;
 import ua.pp.leon.service.ProductService;
 
@@ -37,22 +39,23 @@ public class OrderTests extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Test
     public void createOrder() {
-        Order saved = orderService.createOrder(getPersistedProducts(3), new Date());
+        List<CreateOrderParam> createOrderParams = new ArrayList<>(3);
+        createOrderParams.add(new CreateOrderParam(1L, 1));
+        createOrderParams.add(new CreateOrderParam(2L, 3));
+        createOrderParams.add(new CreateOrderParam(3L, 5));
+        Order saved = orderService.createOrder(createOrderParams, new Date());
         assertNotNull(saved);
         LOG.info(saved.toString());
     }
 
     @Test
     public void updateOrder() {
-        Product product = new Product();
-        product.setName("updateOrder");
-        product.setPrice(12.18);
-        product.setSku("New SKU value");
-
+        Product product = productService.getById(18L);
         Order order = orderService.getById(1L);
         LOG.info(order.toString());
-        order.getProducts().add(product);
-        product.getOrders().add(order);
+        OrderItem orderItem = new OrderItem(order, product, 3);
+        order.getOrderItems().add(orderItem);
+        product.getOrderItems().add(orderItem);
         order.recalculateSum();
         Order saved = orderService.save(order);
         assertNotNull(saved);

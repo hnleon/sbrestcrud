@@ -6,9 +6,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.pp.leon.controller.data.CreateOrderParam;
 import ua.pp.leon.domain.Order;
+import ua.pp.leon.domain.OrderItem;
 import ua.pp.leon.domain.OrderRepository;
-import ua.pp.leon.domain.Product;
+import ua.pp.leon.domain.ProductRepository;
 import ua.pp.leon.service.OrderService;
 import ua.pp.leon.service.OrderService.DailyReport;
 
@@ -21,10 +23,12 @@ import ua.pp.leon.service.OrderService.DailyReport;
 public class OrderServiceImp implements OrderService {
 
     protected final OrderRepository orderRepository;
+    protected final ProductRepository productRepository;
 
     @Autowired
-    public OrderServiceImp(OrderRepository orderRepository) {
+    public OrderServiceImp(OrderRepository orderRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -51,12 +55,14 @@ public class OrderServiceImp implements OrderService {
 
     @Override
     @Transactional
-    public Order createOrder(List<Product> products, Date date) {
+    public Order createOrder(List<CreateOrderParam> createOrderParams, Date date) {
         Order order = new Order();
         order.setOrderDate(date);
-        for (Product product : products) {
-            order.getProducts().add(product);
-//            product.getOrders().add(order); // Fails in production but not in tests... :(
+        order = orderRepository.save(order);
+        List<OrderItem> orderItems = prepareOrderItems(createOrderParams, order);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setOrder(order);
+            order.getOrderItems().add(orderItem);
         }
         order.recalculateSum();
         return orderRepository.save(order);
@@ -69,6 +75,17 @@ public class OrderServiceImp implements OrderService {
         orderRepository.generateDailyReport().stream().forEach((day) -> {
             result.add(new DailyReport((Date) day[0], (Double) day[1]));
         });
+        return result;
+    }
+
+    protected List<OrderItem> prepareOrderItems(List<CreateOrderParam> createOrderParams, Order order) {
+        List<OrderItem> result = new ArrayList<>(createOrderParams.size());
+        for (CreateOrderParam orderParam : createOrderParams) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(productRepository.findOne(orderParam.getProductId()));
+            orderItem.setQuantity(orderParam.getQuantity());
+            result.add(orderItem);
+        }
         return result;
     }
 }

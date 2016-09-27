@@ -2,8 +2,8 @@ package ua.pp.leon.service;
 
 import java.util.Date;
 import java.util.List;
+import ua.pp.leon.controller.data.CreateOrderParam;
 import ua.pp.leon.domain.Order;
-import ua.pp.leon.domain.Product;
 
 /**
  *
@@ -38,11 +38,11 @@ public interface OrderService {
     /**
      * Creates a new persisted {@link Order} instance.
      *
-     * @param products list of products to include into the list.
+     * @param createOrderParams list of products and their quantities to include into the list.
      * @param date date date-time to bind current record to.
      * @return persisted {@link Order} instance.
      */
-    Order createOrder(List<Product> products, Date date);
+    Order createOrder(List<CreateOrderParam> createOrderParams, Date date);
 
     /**
      * Generates a daily report for the whole DB.
