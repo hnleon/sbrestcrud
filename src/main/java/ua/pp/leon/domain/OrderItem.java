@@ -50,6 +50,7 @@ public class OrderItem implements Serializable {
         int hash = 7;
         hash = 53 * hash + Objects.hashCode(this.quantity);
         hash = 53 * hash + Objects.hashCode(this.product);
+        hash = 53 * hash + Objects.hashCode(this.order);
         return hash;
     }
 
@@ -69,6 +70,9 @@ public class OrderItem implements Serializable {
             return false;
         }
         if (!Objects.equals(this.product, other.product)) {
+            return false;
+        }
+        if (!Objects.equals(this.order, other.order)) {
             return false;
         }
         return true;

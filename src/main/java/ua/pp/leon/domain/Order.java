@@ -50,6 +50,7 @@ public class Order implements Serializable, Comparable<Order> {
     public int hashCode() {
         int hash = 7;
         hash = 89 * hash + Objects.hashCode(this.id);
+        hash = 89 * hash + Objects.hashCode(this.orderDate);
         hash = 89 * hash + Objects.hashCode(this.sum);
         return hash;
     }
@@ -67,6 +68,9 @@ public class Order implements Serializable, Comparable<Order> {
         }
         final Order other = (Order) obj;
         if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.orderDate, other.orderDate)) {
             return false;
         }
         if (!Objects.equals(this.sum, other.sum)) {

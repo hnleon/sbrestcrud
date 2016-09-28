@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ua.pp.leon.controller.data.DailyReportWrapperMockup;
 import ua.pp.leon.domain.Order;
 import ua.pp.leon.service.OrderService;
 import ua.pp.leon.service.OrderService.DailyReport;
@@ -31,8 +32,8 @@ public class StatsRestController {
     private OrderService orderService;
 
     @RequestMapping(value = "/daily", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<DailyReport> dailyReport() {
-        return orderService.generateDailyReport();
+    public DailyReportWrapperMockup dailyReport() {
+        return new DailyReportWrapperMockup(orderService.generateDailyReport());
     }
 
 //    @RequestMapping(value = "/order", method = RequestMethod.GET)

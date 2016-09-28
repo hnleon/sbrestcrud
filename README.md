@@ -24,21 +24,27 @@ Create Spring-boot service application with REST CRUD methods for this entities:
 <li>project configured to "create-drop" database structure and has some mock records. File "src/main/resources/import.sql" contains all data insertion routines;</li>
 <li>swagger support is not implemented - never did this before (sadly :( )</li>
 </ul>
-<h3>"GET" REST links</h3>
+
+<h3>GET REST links</h3>
 <ul>
-<li>http://localhost:8080/ - list of all repositories;</li>
-<li>http://localhost:8080/categories;</li>
-<li>http://localhost:8080/products;</li>
-<li>http://localhost:8080/orders;</li>
-<li>http://localhost:8080/stats/daily - <i>report controller which returns date and sum of income grouped by day</i>;</li>
+<li><b>Date and sum of income grouped by day: </b>http://localhost:8080/stats/daily</li>
+<li><b>All repositories: </b>http://localhost:8080/</li>
+<li><b>Orders: </b>http://localhost:8080/orders</li>
+<li><b>Categories </b>http://localhost:8080/categories</li>
+<li><b>Products </b>http://localhost:8080/products</li>
 </ul>
 
-<h3>Other REST "link" usage</h3>
+<h3>Create REST usage samples</h3>
 <ul>
-<li>curl -X DELETE http://localhost:8080/categories/1</li>
-<li>curl -X DELETE http://localhost:8080/products/1</li>
-<li>curl -X DELETE http://localhost:8080/orders/1</li>
-<li>curl -X POST -H 'Content-Type: application/json' -d '{"name":"New Category"}' http://localhost:8080/categories</li>
-<li>curl -X POST -H 'Content-Type: application/json' -d '{"name":"New Item Name","price":0,"sku":"sku value","category_id":1}' http://localhost:8080/products</li>
+<li><b>Order: </b>curl -X POST -H 'Content-Type: application/json' -d '[{"productId": 7, "quantity": 3}, {"productId": 11, "quantity": 4}, {"productId": 24, "quantity": 5}]' http://localhost:8080/api/order</li>
+<li><b>Category: </b>curl -X POST -H 'Content-Type: application/json' -d '{"name":"New Category"}' http://localhost:8080/categories</li>
+<li><b>Product: </b>curl -X POST -H 'Content-Type: application/json' -d '{"name":"New Item Name","price":0,"sku":"sku value","category_id":1}' http://localhost:8080/products</li>
+
 </ul>
 
+<h3>Delete REST usage samples</h3>
+<ul>
+<li><b>Order: </b>curl -X DELETE http://localhost:8080/orders/1</li>
+<li><b>Category: </b>curl -X DELETE http://localhost:8080/categories/1</li>
+<li><b>Product: </b>curl -X DELETE http://localhost:8080/products/1</li>
+</ul>
